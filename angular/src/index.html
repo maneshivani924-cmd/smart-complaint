@@ -1,0 +1,3334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ResolveIQ - Smart Complaint Prioritization</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0b1020;color:#fff}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* LOGIN */
+#loginScreen{
+ min-height:100vh;display:flex;align-items:center;
+ justify-content:center;padding:30px;
+ background:linear-gradient(135deg,#080d1c,#16234a,#071827)
+}
+.login-box{
+ width:100%;max-width:450px;padding:40px;
+ background:rgba(17,25,47,.9);
+ border:1px solid #293553;border-radius:25px;
+ box-shadow:0 25px 70px #0008
+}
+.logo{font-size:38px;font-weight:900;margin-bottom:10px}
+.logo span{color:#8b5cf6}
+.login-box h1{font-size:30px;margin-bottom:8px}
+.subtitle{color:#94a3b8;margin-bottom:28px}
+.form-group{margin-bottom:18px}
+label{display:block;font-size:13px;margin-bottom:7px;color:#cbd5e1}
+input,select,textarea{
+ width:100%;padding:13px 14px;
+ background:#0b1328;border:1px solid #293553;
+ border-radius:11px;color:white;outline:none
+}
+textarea{min-height:120px;resize:vertical}
+input:focus,select:focus,textarea:focus{
+ border-color:#7568ff;box-shadow:0 0 0 3px #6c63ff20
+}
+.login-btn,.primary{
+ width:100%;padding:14px;border:0;border-radius:12px;
+ background:linear-gradient(135deg,#6c63ff,#8b5cf6);
+ color:white;font-weight:bold
+}
+.demo{
+ margin-top:20px;padding:13px;background:#06b6d410;
+ border:1px solid #06b6d425;border-radius:10px;
+ color:#94a3b8;font-size:12px;line-height:1.7
+}
+.error{color:#f87171;font-size:12px;margin-top:10px}
+
+/* APP */
+#app{min-height:100vh;background:#0a1020}
+.sidebar{
+ position:fixed;left:0;top:0;bottom:0;width:250px;
+ background:#0d1428;border-right:1px solid #202c47;
+ padding:25px 15px;z-index:10
+}
+.brand{padding:0 15px 25px;border-bottom:1px solid #202c47}
+.brand-name{font-size:25px;font-weight:900}
+.brand-name span{color:#8b5cf6}
+.brand-small{font-size:9px;color:#64748b;margin-top:5px}
+.nav-title{
+ font-size:10px;color:#475569;margin:22px 15px 8px;
+ letter-spacing:1px
+}
+.nav{
+ width:100%;padding:12px 15px;border:0;
+ background:transparent;color:#94a3b8;text-align:left;
+ border-radius:10px;margin:3px 0
+}
+.nav:hover,.nav.active{background:#6c63ff20;color:white}
+.logout{color:#f87171;position:absolute;bottom:20px;left:15px;right:15px;width:calc(100% - 30px)}
+
+.main{margin-left:250px}
+.topbar{
+ height:75px;padding:0 28px;display:flex;
+ justify-content:space-between;align-items:center;
+ background:#0d1428;border-bottom:1px solid #202c47;
+ position:sticky;top:0;z-index:5
+}
+.topbar h2{font-size:20px}
+.user{
+ display:flex;align-items:center;gap:10px;
+ background:#111a31;padding:7px 12px;border-radius:25px
+}
+.avatar{
+ width:34px;height:34px;border-radius:50%;
+ display:grid;place-items:center;
+ background:linear-gradient(135deg,#6c63ff,#06b6d4);
+ font-weight:bold
+}
+.content{padding:30px}
+.page{display:none}
+.page.active{display:block}
+
+/* HERO */
+.hero{
+ padding:30px;border-radius:20px;
+ background:linear-gradient(135deg,#151d39,#10182d);
+ border:1px solid #293553;margin-bottom:22px
+}
+.hero h1{font-size:32px;margin:12px 0}
+.hero p{color:#94a3b8;line-height:1.7}
+.hero-btn{
+ margin-top:20px;padding:11px 18px;
+ border:0;border-radius:10px;
+ background:#6c63ff;color:white;font-weight:bold
+}
+
+/* STATS */
+.stats{
+ display:grid;grid-template-columns:repeat(4,1fr);
+ gap:15px;margin-bottom:22px
+}
+.stat,.card{
+ background:#11192f;border:1px solid #202c47;
+ border-radius:17px;padding:20px
+}
+.stat-icon{font-size:25px}
+.stat h2{font-size:28px;margin-top:15px}
+.stat p{font-size:12px;color:#64748b}
+
+/* GRID */
+.grid{
+ display:grid;grid-template-columns:1.4fr 1fr;gap:18px
+}
+.card h3{margin-bottom:18px}
+.row{
+ display:flex;align-items:center;gap:12px;
+ padding:13px 0;border-bottom:1px solid #ffffff09
+}
+.row:last-child{border:0}
+.row-info{flex:1}
+.row-info b{font-size:13px}
+.row-info small{display:block;color:#64748b;margin-top:4px}
+.badge{
+ display:inline-block;padding:5px 9px;border-radius:20px;
+ font-size:10px;font-weight:bold
+}
+.high{background:#ef444420;color:#f87171}
+.medium{background:#f59e0b20;color:#fbbf24}
+.low{background:#10b98120;color:#34d399}
+.pending{background:#f59e0b20;color:#fbbf24}
+.progress{background:#06b6d420;color:#22d3ee}
+.resolved{background:#10b98120;color:#34d399}
+.rejected{background:#ef444420;color:#f87171}
+
+/* FORM */
+.form-card{max-width:900px;margin:auto}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.full{grid-column:1/-1}
+.smart{
+ margin-top:20px;padding:18px;
+ border:1px dashed #6c63ff66;
+ border-radius:14px;background:#6c63ff09
+}
+.score{
+ width:55px;height:55px;border-radius:50%;
+ border:4px solid #6c63ff;
+ display:grid;place-items:center;font-weight:bold
+}
+.smart-result{display:flex;gap:15px;align-items:center;margin-top:12px}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.btn{
+ padding:11px 17px;border:0;border-radius:10px;
+ font-weight:bold
+}
+.secondary{background:#1e293b;color:#cbd5e1}
+.primary{background:#6c63ff;color:white}
+
+/* TABLE */
+.toolbar{display:flex;gap:10px;margin-bottom:18px}
+.toolbar input{flex:1}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th,td{text-align:left;padding:13px;border-bottom:1px solid #ffffff08;font-size:12px}
+th{color:#64748b;font-size:10px}
+.action{padding:7px 10px;background:#18213a;color:#cbd5e1;border:1px solid #293553;border-radius:7px}
+
+/* MOBILE */
+@media(max-width:900px){
+ .sidebar{transform:translateX(-100%)}
+ .main{margin-left:0}
+ .stats{grid-template-columns:1fr 1fr}
+ .grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ #loginScreen{padding:15px}
+ .login-box{padding:25px}
+ .content{padding:15px}
+ .form-grid{grid-template-columns:1fr}
+ .full{grid-column:auto}
+ .stats{grid-template-columns:1fr 1fr}
+ .topbar{padding:0 15px}
+}
+</style>
+</head>
+
+<body>
+  
+<app-root></app-root>
+<!-- LOGIN -->
+<section id="loginScreen">
+
+<div class="login-box">
+
+<div class="logo">Resolve<span>IQ</span></div>
+
+<h1>Smart Complaint System</h1>
+
+<p class="subtitle">
+Report Smart. Prioritize Faster. Resolve Better.
+</p>
+
+<form id="loginForm">
+
+<div class="form-group">
+<label>Username</label>
+<input id="username" placeholder="Enter username" required>
+</div>
+
+<div class="form-group">
+<label>Password</label>
+<input id="password" type="password" placeholder="Enter password" required>
+</div>
+
+<button class="login-btn">
+Sign In to ResolveIQ →
+</button>
+
+<div id="loginError" class="error"></div>
+
+</form>
+
+<div class="demo">
+<b>Demo Login</b><br>
+User: <b>student</b> / <b>1234</b><br>
+Admin: <b>admin</b> / <b>admin123</b>
+</div>
+
+</div>
+</section>
+
+
+<!-- APPLICATION -->
+<div id="app" class="hidden">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+<div class="brand">
+<div class="brand-name">Resolve<span>IQ</span></div>
+<div class="brand-small">SMART COMPLAINT PRIORITIZATION</div>
+</div>
+
+<div class="nav-title">MAIN</div>
+
+<button class="nav active" onclick="showPage('dashboard',this)">
+🏠 Dashboard
+</button>
+
+<button class="nav" onclick="showPage('new',this)">
+➕ Submit Complaint
+</button>
+
+<button class="nav" onclick="showPage('complaints',this)">
+📋 All Complaints
+</button>
+
+<button class="nav" onclick="showPage('my',this)">
+👤 My Complaints
+</button>
+
+<div class="nav-title">INSIGHTS</div>
+
+<button class="nav" onclick="showPage('analytics',this)">
+📊 Analytics
+</button>
+
+<button class="nav" onclick="showPage('notifications',this)">
+🔔 Notifications
+</button>
+
+<div id="adminNav">
+<div class="nav-title">ADMIN</div>
+
+<button class="nav" onclick="showPage('admin',this)">
+🛡️ Admin Panel
+</button>
+</div>
+
+<button class="nav logout" onclick="logout()">
+🚪 Logout
+</button>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+<header class="topbar">
+
+<div>
+<h2 id="pageTitle">Smart Dashboard</h2>
+<small style="color:#64748b">
+Complaint intelligence & resolution center
+</small>
+</div>
+
+<div class="user">
+<div class="avatar" id="avatar">U</div>
+<div id="userName">User</div>
+</div>
+
+</header>
+
+
+<div class="content">
+
+
+<!-- DASHBOARD -->
+<section id="dashboardPage" class="page active">
+
+<div class="hero">
+
+<span style="color:#34d399;font-size:11px">
+● SYSTEM ONLINE
+</span>
+
+<h1>
+Good morning, <span id="heroUser">User</span> 👋
+</h1>
+
+<p>
+ResolveIQ analyzes complaints, detects urgency and helps
+authorities focus on the most important issues first.
+</p>
+
+<button class="hero-btn" onclick="showPageByName('new')">
++ Raise New Complaint
+</button>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-icon">📋</div>
+<h2 id="total">0</h2>
+<p>Total Complaints</p>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🔴</div>
+<h2 id="highCount">0</h2>
+<p>High Priority</p>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🔄</div>
+<h2 id="progressCount">0</h2>
+<p>In Progress</p>
+</div>
+
+<div class="stat">
+<div class="stat-icon">✅</div>
+<h2 id="resolvedCount">0</h2>
+<p>Resolved</p>
+</div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card">
+
+<h3>Recent Complaints</h3>
+
+<div id="recent"></div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Priority Overview</h3>
+
+<div id="overview"></div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- NEW COMPLAINT -->
+<section id="newPage" class="page">
+
+<h1>Submit a Complaint</h1>
+
+<p style="color:#64748b;margin:7px 0 22px">
+Enter the issue and let the Smart Priority Engine analyze it.
+</p>
+
+<div class="card form-card">
+
+<form id="complaintForm">
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Category</label>
+
+<select id="category" required onchange="preview()">
+<option value="">Select Category</option>
+<option>Water</option>
+<option>Electricity</option>
+<option>Road</option>
+<option>Garbage</option>
+<option>Security</option>
+<option>Internet</option>
+<option>Maintenance</option>
+<option>Other</option>
+</select>
+
+</div>
+
+
+<div class="form-group">
+<label>Urgency</label>
+
+<select id="urgency" required onchange="preview()">
+<option value="">Select Urgency</option>
+<option value="1">Normal</option>
+<option value="2">Important</option>
+<option value="3">Urgent</option>
+<option value="4">Critical / Emergency</option>
+</select>
+
+</div>
+
+
+<div class="form-group">
+<label>Affected People</label>
+
+<select id="affected" required onchange="preview()">
+<option value="">Select Impact</option>
+<option value="1">Only Me</option>
+<option value="2">Few People</option>
+<option value="3">Building / Area</option>
+<option value="4">Large Community</option>
+</select>
+
+</div>
+
+
+<div class="form-group">
+<label>Location</label>
+
+<input id="location" placeholder="e.g. Block A, Room 204" required>
+
+</div>
+
+
+<div class="form-group full">
+<label>Complaint Title</label>
+
+<input
+id="title"
+placeholder="Briefly describe the problem"
+required
+oninput="preview()"
+>
+
+</div>
+
+
+<div class="form-group full">
+<label>Description</label>
+
+<textarea
+id="description"
+placeholder="Explain the issue in detail..."
+required
+oninput="preview()"
+></textarea>
+
+</div>
+
+</div>
+
+
+<div class="smart">
+
+<h3>🧠 Smart Priority Analysis</h3>
+
+<p style="font-size:12px;color:#64748b">
+Category + keywords + urgency + impact are analyzed automatically.
+</p>
+
+<div class="smart-result">
+
+<div class="score" id="score">
+--
+</div>
+
+<div>
+<span id="priority" class="badge low">
+Waiting...
+</span>
+
+<p id="reason"
+style="font-size:11px;color:#64748b;margin-top:6px">
+Enter complaint information.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button
+type="reset"
+class="btn secondary"
+onclick="setTimeout(preview,10)"
+>
+Clear
+</button>
+
+<button class="btn primary">
+Analyze & Submit →
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</section>
+
+
+<!-- ALL COMPLAINTS -->
+<section id="complaintsPage" class="page">
+
+<h1>Complaint Management</h1>
+
+<p style="color:#64748b;margin:7px 0 22px">
+Search, filter and inspect complaints.
+</p>
+
+<div class="card">
+
+<div class="toolbar">
+
+<input
+id="search"
+placeholder="Search complaints..."
+oninput="renderTable()"
+>
+
+<select id="filterPriority" onchange="renderTable()">
+<option value="all">All Priorities</option>
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+
+<select id="filterStatus" onchange="renderTable()">
+<option value="all">All Status</option>
+<option>Pending</option>
+<option>In Progress</option>
+<option>Resolved</option>
+<option>Rejected</option>
+</select>
+
+</div>
+
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Complaint</th>
+<th>Category</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MY COMPLAINTS -->
+<section id="myPage" class="page">
+
+<h1>My Complaints</h1>
+
+<p style="color:#64748b;margin:7px 0 22px">
+Track complaints submitted by you.
+</p>
+
+<div class="card" id="myList"></div>
+
+</section>
+
+
+<!-- ANALYTICS -->
+<section id="analyticsPage" class="page">
+
+<h1>Analytics & Insights</h1>
+
+<p style="color:#64748b;margin:7px 0 22px">
+Understand complaint trends and resolution performance.
+</p>
+
+<div class="grid">
+
+<div class="card">
+<h3>Priority Distribution</h3>
+
+<div id="analytics"></div>
+
+</div>
+
+<div class="card">
+<h3>Smart Insight</h3>
+
+<div id="insight"
+style="color:#94a3b8;line-height:1.8;font-size:13px">
+Add complaints to generate insights.
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- NOTIFICATIONS -->
+<section id="notificationsPage" class="page">
+
+<h1>Notifications</h1>
+
+<p style="color:#64748b;margin:7px 0 22px">
+Complaint activity and system alerts.
+</p>
+
+<div id="notifications"></div>
+
+</section>
+
+
+<!-- ADMIN -->
+<section id="adminPage" class="page">
+
+<h1>Admin Control Center</h1>
+
+<p style="color:#64748b;margin:7px 0 22px">
+Manage complaints and monitor the system.
+</p>
+
+<div class="card">
+
+<h3>🛡️ Authority Mode</h3>
+
+<p style="color:#94a3b8;line-height:1.8">
+Admin can open complaints, update their status and
+generate system reports.
+</p>
+
+<br>
+
+<button class="btn primary" onclick="showPageByName('complaints')">
+Manage Complaints
+</button>
+
+<button class="btn secondary" onclick="report()">
+Generate Report
+</button>
+
+</div>
+
+</section>
+
+</div>
+</main>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+id="modal"
+class="hidden"
+style="
+position:fixed;inset:0;background:#000b;
+display:flex;align-items:center;justify-content:center;
+padding:20px;z-index:100;
+">
+
+<div
+class="card"
+style="width:100%;max-width:650px;max-height:90vh;overflow:auto"
+>
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center
+">
+
+<h2 id="modalTitle">Complaint</h2>
+
+<button
+class="btn secondary"
+onclick="closeModal()"
+>
+✕
+</button>
+
+</div>
+
+<div id="modalContent" style="margin-top:20px"></div>
+
+<div id="adminControls" class="hidden"
+style="margin-top:20px;padding-top:20px;border-top:1px solid #293553">
+
+<select id="newStatus">
+<option>Pending</option>
+<option>In Progress</option>
+<option>Resolved</option>
+<option>Rejected</option>
+</select>
+
+<button
+class="btn primary"
+onclick="updateStatus()"
+>
+Update Status
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+  /* ===============================
+   RESOLVEIQ - JAVASCRIPT
+================================ */
+
+const STORAGE_KEY = "resolveiq_complaints_v1";
+
+let currentUser = null;
+let selectedComplaintId = null;
+
+
+/* ===============================
+   DEMO DATA
+================================ */
+
+const demoComplaints = [
+{
+ id:"CMP-1001",
+ user:"student",
+ title:"Water leakage in building",
+ description:"Major water leakage is happening near the main entrance.",
+ category:"Water",
+ urgency:4,
+ affected:4,
+ location:"Block A",
+ priority:"High",
+ score:92,
+ status:"In Progress",
+ date:"2026-10-01"
+},
+{
+ id:"CMP-1002",
+ user:"student",
+ title:"Street light not working",
+ description:"The street light near the parking area is not working.",
+ category:"Electricity",
+ urgency:2,
+ affected:3,
+ location:"Parking Area",
+ priority:"Medium",
+ score:58,
+ status:"Pending",
+ date:"2026-10-02"
+},
+{
+ id:"CMP-1003",
+ user:"student",
+ title:"Garbage collection issue",
+ description:"Garbage has not been collected for two days.",
+ category:"Garbage",
+ urgency:2,
+ affected:3,
+ location:"Block B",
+ priority:"Medium",
+ score:55,
+ status:"Resolved",
+ date:"2026-09-29"
+},
+{
+ id:"CMP-1004",
+ user:"admin",
+ title:"Security camera failure",
+ description:"CCTV camera near the main gate is offline.",
+ category:"Security",
+ urgency:4,
+ affected:4,
+ location:"Main Gate",
+ priority:"High",
+ score:95,
+ status:"In Progress",
+ date:"2026-10-03"
+}
+];
+
+
+/* ===============================
+   LOAD DATA
+================================ */
+
+function loadData(){
+
+ let data = localStorage.getItem(STORAGE_KEY);
+
+ if(!data){
+
+   localStorage.setItem(
+     STORAGE_KEY,
+     JSON.stringify(demoComplaints)
+   );
+
+   return demoComplaints;
+ }
+
+ return JSON.parse(data);
+}
+
+
+function saveData(data){
+
+ localStorage.setItem(
+   STORAGE_KEY,
+   JSON.stringify(data)
+ );
+
+}
+
+
+/* ===============================
+   LOGIN
+================================ */
+
+document
+.getElementById("loginForm")
+.addEventListener("submit",function(e){
+
+ e.preventDefault();
+
+ const username =
+ document.getElementById("username").value.trim();
+
+ const password =
+ document.getElementById("password").value.trim();
+
+ const error =
+ document.getElementById("loginError");
+
+
+ if(
+   username === "student" &&
+   password === "1234"
+ ){
+
+   loginSuccess({
+     username:"student",
+     role:"User"
+   });
+
+ }
+
+ else if(
+   username === "admin" &&
+   password === "admin123"
+ ){
+
+   loginSuccess({
+     username:"admin",
+     role:"Admin"
+   });
+
+ }
+
+ else{
+
+   error.textContent =
+   "Invalid username or password.";
+
+ }
+
+});
+
+
+/* ===============================
+   LOGIN SUCCESS
+================================ */
+
+function loginSuccess(user){
+
+ currentUser = user;
+
+ sessionStorage.setItem(
+   "resolveiq_session",
+   JSON.stringify(user)
+ );
+
+ document
+ .getElementById("loginScreen")
+ .classList.add("hidden");
+
+ document
+ .getElementById("app")
+ .classList.remove("hidden");
+
+ document
+ .getElementById("userName")
+ .textContent =
+ user.username;
+
+ document
+ .getElementById("avatar")
+ .textContent =
+ user.username.charAt(0).toUpperCase();
+
+ document
+ .getElementById("heroUser")
+ .textContent =
+ user.username;
+
+ if(user.role === "Admin"){
+
+   document
+   .getElementById("adminNav")
+   .classList.remove("hidden");
+
+ }
+
+ else{
+
+   document
+   .getElementById("adminNav")
+   .classList.add("hidden");
+
+ }
+
+ updateAll();
+
+}
+
+
+/* ===============================
+   AUTO LOGIN
+================================ */
+
+window.addEventListener("load",function(){
+
+ const session =
+ sessionStorage.getItem("resolveiq_session");
+
+ if(session){
+
+   loginSuccess(
+     JSON.parse(session)
+   );
+
+ }
+
+});
+
+
+/* ===============================
+   LOGOUT
+================================ */
+
+function logout(){
+
+ sessionStorage.removeItem(
+   "resolveiq_session"
+ );
+
+ currentUser = null;
+
+ document
+ .getElementById("app")
+ .classList.add("hidden");
+
+ document
+ .getElementById("loginScreen")
+ .classList.remove("hidden");
+
+ document
+ .getElementById("username")
+ .value = "";
+
+ document
+ .getElementById("password")
+ .value = "";
+
+}
+
+
+/* ===============================
+   PAGE NAVIGATION
+================================ */
+
+const pageNames = {
+ dashboard:"Smart Dashboard",
+ new:"Submit Complaint",
+ complaints:"Complaint Management",
+ my:"My Complaints",
+ analytics:"Analytics & Insights",
+ notifications:"Notifications",
+ admin:"Admin Control Center"
+};
+
+
+function showPage(page,button){
+
+ document
+ .querySelectorAll(".page")
+ .forEach(p=>{
+   p.classList.remove("active");
+ });
+
+ const target =
+ document.getElementById(page+"Page");
+
+ if(target){
+   target.classList.add("active");
+ }
+
+ document
+ .querySelectorAll(".nav")
+ .forEach(n=>{
+   n.classList.remove("active");
+ });
+
+ if(button){
+   button.classList.add("active");
+ }
+
+ document
+ .getElementById("pageTitle")
+ .textContent =
+ pageNames[page] || "ResolveIQ";
+
+ updateAll();
+
+}
+
+
+function showPageByName(page){
+
+ const nav =
+ [...document.querySelectorAll(".nav")]
+ .find(n=>
+   n.getAttribute("onclick") &&
+   n.getAttribute("onclick")
+   .includes("'" + page + "'")
+ );
+
+ showPage(page,nav);
+
+}
+
+
+/* ===============================
+   SMART PRIORITY ENGINE
+================================ */
+
+function calculatePriority(
+ category,
+ title,
+ description,
+ urgency,
+ affected
+){
+
+ let score = 0;
+
+ /* CATEGORY WEIGHT */
+
+ const categoryWeight = {
+
+   Security:22,
+   Electricity:18,
+   Water:18,
+   Road:15,
+   Internet:13,
+   Maintenance:12,
+   Garbage:10,
+   Other:7
+
+ };
+
+ score +=
+ categoryWeight[category] || 5;
+
+
+ /* URGENCY */
+
+ score +=
+ Number(urgency || 0) * 8;
+
+
+ /* AFFECTED PEOPLE */
+
+ score +=
+ Number(affected || 0) * 7;
+
+
+ /* KEYWORD ANALYSIS */
+
+ const text =
+ (
+   title + " " + description
+ )
+ .toLowerCase();
+
+
+ const highKeywords = [
+
+   "fire",
+   "accident",
+   "danger",
+   "emergency",
+   "leak",
+   "leakage",
+   "electric shock",
+   "security",
+   "crime",
+   "theft",
+   "injury",
+   "unsafe",
+   "gas",
+   "flood",
+   "cctv",
+   "broken wire",
+   "sparking"
+
+ ];
+
+
+ const mediumKeywords = [
+
+   "not working",
+   "problem",
+   "issue",
+   "delay",
+   "damage",
+   "dirty",
+   "repair",
+   "blocked",
+   "slow",
+   "noise"
+
+ ];
+
+
+ highKeywords.forEach(keyword=>{
+
+   if(text.includes(keyword)){
+     score += 8;
+   }
+
+ });
+
+
+ mediumKeywords.forEach(keyword=>{
+
+   if(text.includes(keyword)){
+     score += 3;
+   }
+
+ });
+
+
+ /* CAP SCORE */
+
+ score =
+ Math.min(100,score);
+
+
+ let priority = "Low";
+
+
+ if(score >= 70){
+
+   priority = "High";
+
+ }
+
+ else if(score >= 45){
+
+   priority = "Medium";
+
+ }
+
+
+ return {
+
+   score,
+   priority
+
+ };
+
+}
+
+
+/* ===============================
+   LIVE PRIORITY PREVIEW
+================================ */
+
+function preview(){
+
+ const category =
+ document.getElementById("category").value;
+
+ const title =
+ document.getElementById("title").value;
+
+ const description =
+ document.getElementById("description").value;
+
+ const urgency =
+ document.getElementById("urgency").value;
+
+ const affected =
+ document.getElementById("affected").value;
+
+
+ if(
+   !category &&
+   !title &&
+   !description &&
+   !urgency &&
+   !affected
+ ){
+
+   document.getElementById("score")
+   .textContent = "--";
+
+   document.getElementById("priority")
+   .textContent = "Waiting...";
+
+   document.getElementById("priority")
+   .className = "badge low";
+
+   return;
+
+ }
+
+
+ const result =
+ calculatePriority(
+   category,
+   title,
+   description,
+   urgency,
+   affected
+ );
+
+
+ document.getElementById("score")
+ .textContent =
+ result.score;
+
+
+ const badge =
+ document.getElementById("priority");
+
+ badge.textContent =
+ result.priority;
+
+ badge.className =
+ "badge " +
+ result.priority.toLowerCase();
+
+
+ let reason =
+ "Priority calculated using smart analysis.";
+
+ if(result.priority === "High"){
+
+   reason =
+   "Critical factors or high-impact keywords detected.";
+
+ }
+
+ else if(result.priority === "Medium"){
+
+   reason =
+   "Complaint requires attention but is not immediately critical.";
+
+ }
+
+ else{
+
+   reason =
+   "Complaint currently appears to have lower impact.";
+
+ }
+
+ document.getElementById("reason")
+ .textContent =
+ reason;
+
+}
+
+
+/* ===============================
+   SUBMIT COMPLAINT
+================================ */
+
+document
+.getElementById("complaintForm")
+.addEventListener("submit", async function(e){
+
+ e.preventDefault();
+
+ try {
+
+   const category =
+   document.getElementById("category").value;
+
+   const title =
+   document.getElementById("title").value.trim();
+
+   const description =
+   document.getElementById("description").value.trim();
+
+   const urgency =
+   document.getElementById("urgency").value;
+
+   const affected =
+   document.getElementById("affected").value;
+
+   const location =
+   document.getElementById("location").value.trim();
+
+
+   /* SMART PRIORITY */
+
+   const result =
+   calculatePriority(
+     category,
+     title,
+     description,
+     urgency,
+     affected
+   );
+
+
+   /* CREATE COMPLAINT */
+
+   const complaint = {
+
+     user: currentUser.username,
+
+     title: title,
+
+     description: description,
+
+     category: category,
+
+     urgency: Number(urgency),
+
+     affected: Number(affected),
+
+     location: location,
+
+     priority: result.priority,
+
+     score: result.score,
+
+     status: "Pending",
+
+     date: new Date()
+       .toISOString()
+       .split("T")[0]
+
+   };
+
+
+   /* SEND TO BACKEND */
+
+   const response =
+   await fetch(
+     "http://localhost:5000/api/complaints",
+     {
+       method: "POST",
+
+       headers: {
+         "Content-Type": "application/json"
+       },
+
+       body: JSON.stringify(complaint)
+     }
+   );
+
+
+   const data =
+   await response.json();
+
+
+   /* BACKEND ERROR */
+
+   if(!response.ok){
+
+     throw new Error(
+       data.message ||
+       "Unable to submit complaint"
+     );
+
+   }
+
+
+   /* GET SAVED COMPLAINT */
+
+   const savedComplaint =
+   data.complaint;
+
+
+   /* ALSO UPDATE LOCAL DATA */
+
+   const complaints =
+   loadData();
+
+   complaints.unshift(savedComplaint);
+
+   saveData(complaints);
+
+
+   /* SUCCESS MESSAGE */
+
+   alert(
+     "Complaint submitted successfully!\n\n" +
+     "Complaint ID: " +
+     savedComplaint.id +
+     "\nPriority: " +
+     savedComplaint.priority +
+     "\nScore: " +
+     savedComplaint.score +
+     "/100"
+   );
+
+
+   /* RESET FORM */
+
+   this.reset();
+
+   preview();
+
+
+   /* UPDATE WEBSITE */
+
+   updateAll();
+
+   showPageByName("my");
+
+
+ } catch(error){
+
+   console.error(
+     "Complaint Submit Error:",
+     error
+   );
+
+
+   alert(
+     "Unable to submit complaint.\n\n" +
+     "Please make sure the backend is running on port 5000."
+   );
+
+ }
+
+});
+
+
+/* ===============================
+   DASHBOARD UPDATE
+================================ */
+
+function updateDashboard(){
+
+ const complaints =
+ loadData();
+
+
+ document.getElementById("total")
+ .textContent =
+ complaints.length;
+
+
+ document.getElementById("highCount")
+ .textContent =
+ complaints.filter(
+   c=>c.priority==="High"
+ ).length;
+
+
+ document.getElementById("progressCount")
+ .textContent =
+ complaints.filter(
+   c=>c.status==="In Progress"
+ ).length;
+
+
+ document.getElementById("resolvedCount")
+ .textContent =
+ complaints.filter(
+   c=>c.status==="Resolved"
+ ).length;
+
+
+ renderRecent();
+
+ renderOverview();
+
+}
+
+
+/* ===============================
+   RECENT COMPLAINTS
+================================ */
+
+function renderRecent(){
+
+ const complaints =
+ loadData().slice(0,5);
+
+ const box =
+ document.getElementById("recent");
+
+
+ if(!complaints.length){
+
+   box.innerHTML =
+   "<p style='color:#64748b'>No complaints yet.</p>";
+
+   return;
+
+ }
+
+
+ box.innerHTML =
+ complaints.map(c=>`
+
+ <div class="row">
+
+ <div style="
+ width:35px;height:35px;
+ border-radius:10px;
+ background:#6c63ff20;
+ display:grid;
+ place-items:center
+ ">
+ 📌
+ </div>
+
+ <div class="row-info">
+
+ <b>${escapeHTML(c.title)}</b>
+
+ <small>
+ ${c.id} • ${c.category}
+ </small>
+
+ </div>
+
+ <span class="badge ${c.priority.toLowerCase()}">
+ ${c.priority}
+ </span>
+
+ </div>
+
+ `).join("");
+
+}
+
+
+/* ===============================
+   PRIORITY OVERVIEW
+================================ */
+
+function renderOverview(){
+
+ const complaints =
+ loadData();
+
+ const high =
+ complaints.filter(c=>c.priority==="High").length;
+
+ const medium =
+ complaints.filter(c=>c.priority==="Medium").length;
+
+ const low =
+ complaints.filter(c=>c.priority==="Low").length;
+
+
+ document.getElementById("overview")
+ .innerHTML = `
+
+ <div class="row">
+
+ <div class="row-info">
+ <b>High Priority</b>
+ <small>Immediate attention</small>
+ </div>
+
+ <span class="badge high">
+ ${high}
+ </span>
+
+ </div>
+
+ <div class="row">
+
+ <div class="row-info">
+ <b>Medium Priority</b>
+ <small>Needs attention</small>
+ </div>
+
+ <span class="badge medium">
+ ${medium}
+ </span>
+
+ </div>
+
+ <div class="row">
+
+ <div class="row-info">
+ <b>Low Priority</b>
+ <small>Normal queue</small>
+ </div>
+
+ <span class="badge low">
+ ${low}
+ </span>
+
+ </div>
+
+ `;
+
+}
+
+
+/* ===============================
+   UPDATE ALL
+================================ */
+
+function updateAll(){
+
+ if(!currentUser)return;
+
+ updateDashboard();
+
+ renderTable();
+
+ renderMyComplaints();
+
+ renderAnalytics();
+
+ renderNotifications();
+
+}
+
+
+/* ===============================
+   HTML SECURITY
+================================ */
+
+function escapeHTML(value){
+
+ return String(value)
+ .replace(/&/g,"&amp;")
+ .replace(/</g,"&lt;")
+ .replace(/>/g,"&gt;")
+ .replace(/"/g,"&quot;")
+ .replace(/'/g,"&#039;");
+
+}
+/* ===============================
+   COMPLAINT TABLE
+================================ */
+
+function renderTable(){
+
+ const tbody =
+ document.getElementById("tableBody");
+
+ if(!tbody)return;
+
+ let complaints =
+ loadData();
+
+
+ /* SEARCH */
+
+ const search =
+ document.getElementById("search")
+ ?.value
+ .toLowerCase() || "";
+
+
+ const priority =
+ document.getElementById("filterPriority")
+ ?.value || "all";
+
+
+ const status =
+ document.getElementById("filterStatus")
+ ?.value || "all";
+
+
+ complaints =
+ complaints.filter(c=>{
+
+   const matchesSearch =
+   c.id.toLowerCase().includes(search) ||
+   c.title.toLowerCase().includes(search) ||
+   c.category.toLowerCase().includes(search) ||
+   c.description.toLowerCase().includes(search);
+
+
+   const matchesPriority =
+   priority === "all" ||
+   c.priority === priority;
+
+
+   const matchesStatus =
+   status === "all" ||
+   c.status === status;
+
+
+   return(
+     matchesSearch &&
+     matchesPriority &&
+     matchesStatus
+   );
+
+ });
+
+
+ if(!complaints.length){
+
+   tbody.innerHTML = `
+
+   <tr>
+   <td colspan="6"
+   style="
+   text-align:center;
+   color:#64748b;
+   padding:35px
+   ">
+   No complaints found.
+   </td>
+   </tr>
+
+   `;
+
+   return;
+
+ }
+
+
+ tbody.innerHTML =
+ complaints.map(c=>`
+
+ <tr>
+
+ <td>
+ <b>${c.id}</b>
+ </td>
+
+
+ <td>
+
+ <b>
+ ${escapeHTML(c.title)}
+ </b>
+
+ <br>
+
+ <small style="color:#64748b">
+ ${escapeHTML(c.location)}
+ </small>
+
+ </td>
+
+
+ <td>
+ ${escapeHTML(c.category)}
+ </td>
+
+
+ <td>
+
+ <span class="badge ${c.priority.toLowerCase()}">
+ ${c.priority}
+ </span>
+
+ <br>
+
+ <small style="color:#64748b">
+ Score: ${c.score}
+ </small>
+
+ </td>
+
+
+ <td>
+
+ <span class="badge ${
+   statusClass(c.status)
+ }">
+
+ ${c.status}
+
+ </span>
+
+ </td>
+
+
+ <td>
+
+ <button
+ class="action"
+ onclick="openComplaint('${c.id}')"
+ >
+ View
+ </button>
+
+ </td>
+
+ </tr>
+
+ `).join("");
+
+}
+
+
+/* ===============================
+   STATUS CLASS
+================================ */
+
+function statusClass(status){
+
+ if(status === "Pending")
+ return "pending";
+
+ if(status === "In Progress")
+ return "progress";
+
+ if(status === "Resolved")
+ return "resolved";
+
+ if(status === "Rejected")
+ return "rejected";
+
+ return "pending";
+
+}
+
+
+/* ===============================
+   MY COMPLAINTS
+================================ */
+
+function renderMyComplaints(){
+
+ const box =
+ document.getElementById("myList");
+
+ if(!box || !currentUser)
+ return;
+
+
+ const complaints =
+ loadData().filter(
+   c=>c.user === currentUser.username
+ );
+
+
+ if(!complaints.length){
+
+   box.innerHTML = `
+
+   <div style="
+   text-align:center;
+   padding:40px;
+   color:#64748b
+   ">
+
+   <div style="font-size:40px">
+   📭
+   </div>
+
+   <h3 style="margin:12px">
+   No Complaints Yet
+   </h3>
+
+   <p>
+   You have not submitted any complaint.
+   </p>
+
+   <button
+   class="btn primary"
+   style="margin-top:15px"
+   onclick="showPageByName('new')"
+   >
+   Submit First Complaint
+   </button>
+
+   </div>
+
+   `;
+
+   return;
+
+ }
+
+
+ box.innerHTML =
+ complaints.map(c=>`
+
+ <div
+ style="
+ padding:18px 0;
+ border-bottom:1px solid #ffffff0a
+ "
+ >
+
+ <div style="
+ display:flex;
+ justify-content:space-between;
+ gap:15px;
+ align-items:start
+ ">
+
+ <div>
+
+ <span
+ style="
+ color:#6c63ff;
+ font-size:11px;
+ font-weight:bold
+ "
+ >
+ ${c.id}
+ </span>
+
+ <h3 style="margin:7px 0">
+ ${escapeHTML(c.title)}
+ </h3>
+
+ <p style="
+ color:#64748b;
+ font-size:12px;
+ line-height:1.6
+ ">
+ ${escapeHTML(c.description)}
+ </p>
+
+ <div style="margin-top:10px">
+
+ <span class="badge ${
+   c.priority.toLowerCase()
+ }">
+ ${c.priority} Priority
+ </span>
+
+ <span class="badge ${
+   statusClass(c.status)
+ }">
+ ${c.status}
+ </span>
+
+ </div>
+
+ </div>
+
+
+ <button
+ class="action"
+ onclick="openComplaint('${c.id}')"
+ >
+ View Details
+ </button>
+
+ </div>
+
+
+ <!-- TRACKING -->
+
+ <div style="
+ margin-top:20px;
+ display:flex;
+ align-items:center;
+ gap:5px
+ ">
+
+ <div class="track-step active">
+ ✓
+ </div>
+
+ <div style="
+ height:2px;
+ flex:1;
+ background:
+ ${c.status !== "Pending"
+ ? "#6c63ff"
+ : "#293553"}
+ ">
+ </div>
+
+ <div class="track-step ${
+   c.status !== "Pending"
+   ? "active":""
+ }">
+ ✓
+ </div>
+
+ <div style="
+ height:2px;
+ flex:1;
+ background:
+ ${c.status === "Resolved"
+ ? "#6c63ff"
+ : "#293553"}
+ ">
+ </div>
+
+ <div class="track-step ${
+   c.status === "Resolved"
+   ? "active":""
+ }">
+ ✓
+ </div>
+
+ </div>
+
+
+ <div style="
+ display:flex;
+ justify-content:space-between;
+ margin-top:6px;
+ color:#64748b;
+ font-size:9px
+ ">
+
+ <span>Submitted</span>
+
+ <span>Processing</span>
+
+ <span>Resolved</span>
+
+ </div>
+
+ </div>
+
+ `).join("");
+
+}
+
+
+/* ===============================
+   TRACKING STYLE
+================================ */
+
+const trackStyle =
+document.createElement("style");
+
+trackStyle.textContent = `
+
+.track-step{
+
+ width:27px;
+ height:27px;
+ border-radius:50%;
+ display:grid;
+ place-items:center;
+ background:#1e293b;
+ color:#64748b;
+ font-size:11px;
+ border:1px solid #293553;
+
+}
+
+.track-step.active{
+
+ background:#6c63ff;
+ color:white;
+ border-color:#6c63ff;
+
+}
+
+`;
+
+document.head.appendChild(trackStyle);
+
+
+/* ===============================
+   OPEN COMPLAINT
+================================ */
+
+function openComplaint(id){
+
+ const complaints =
+ loadData();
+
+ const complaint =
+ complaints.find(c=>c.id===id);
+
+ if(!complaint)return;
+
+
+ selectedComplaintId =
+ id;
+
+
+ document
+ .getElementById("modal")
+ .classList.remove("hidden");
+
+
+ document
+ .getElementById("modalTitle")
+ .textContent =
+ complaint.id;
+
+
+ document
+ .getElementById("modalContent")
+ .innerHTML = `
+
+ <div>
+
+ <div style="
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:15px
+ ">
+
+ <div>
+
+ <span
+ class="badge ${
+   complaint.priority.toLowerCase()
+ }"
+ >
+ ${complaint.priority} Priority
+ </span>
+
+ <h2 style="margin-top:12px">
+ ${escapeHTML(complaint.title)}
+ </h2>
+
+ </div>
+
+ <div
+ class="score"
+ >
+ ${complaint.score}
+ </div>
+
+ </div>
+
+
+ <div
+ style="
+ margin-top:22px;
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px
+ "
+ >
+
+ <div class="stat">
+ <p>Category</p>
+ <b>${escapeHTML(complaint.category)}</b>
+ </div>
+
+ <div class="stat">
+ <p>Status</p>
+ <b>${complaint.status}</b>
+ </div>
+
+ <div class="stat">
+ <p>Location</p>
+ <b>${escapeHTML(complaint.location)}</b>
+ </div>
+
+ <div class="stat">
+ <p>Submitted</p>
+ <b>${complaint.date}</b>
+ </div>
+
+ </div>
+
+
+ <div
+ style="
+ margin-top:18px;
+ padding:17px;
+ background:#0b1328;
+ border-radius:12px
+ "
+ >
+
+ <small style="color:#64748b">
+ DESCRIPTION
+ </small>
+
+ <p
+ style="
+ margin-top:8px;
+ line-height:1.7;
+ color:#cbd5e1
+ "
+ >
+ ${escapeHTML(complaint.description)}
+ </p>
+
+ </div>
+
+
+ <!-- PRIORITY EXPLANATION -->
+
+ <div
+ style="
+ margin-top:15px;
+ padding:17px;
+ border:1px solid #6c63ff30;
+ border-radius:12px
+ "
+ >
+
+ <b>🧠 Smart Priority Analysis</b>
+
+ <p
+ style="
+ margin-top:8px;
+ color:#94a3b8;
+ font-size:12px;
+ line-height:1.7
+ "
+ >
+ Priority Score: <b>${complaint.score}/100</b><br>
+
+ The score is calculated using category,
+ urgency, affected people and important
+ keywords detected in the complaint.
+ </p>
+
+ </div>
+
+
+ <!-- STATUS TIMELINE -->
+
+ <div style="margin-top:20px">
+
+ <b>Status Timeline</b>
+
+ <div style="
+ margin-top:15px;
+ border-left:2px solid #293553;
+ padding-left:18px
+ ">
+
+ <div style="margin-bottom:18px">
+ <b>Complaint Submitted</b>
+ <small style="
+ display:block;
+ color:#64748b;
+ margin-top:4px
+ ">
+ ${complaint.date}
+ </small>
+ </div>
+
+ <div style="margin-bottom:18px">
+
+ <b>
+ ${
+ complaint.status === "Pending"
+ ? "Waiting for Authority Review"
+ : "Complaint Reviewed"
+ }
+ </b>
+
+ <small style="
+ display:block;
+ color:#64748b;
+ margin-top:4px
+ ">
+ Smart system has classified the complaint.
+ </small>
+
+ </div>
+
+ <div>
+
+ <b>
+ ${
+ complaint.status === "Resolved"
+ ? "Complaint Resolved"
+ : "Resolution Pending"
+ }
+ </b>
+
+ <small style="
+ display:block;
+ color:#64748b;
+ margin-top:4px
+ ">
+ Current Status: ${complaint.status}
+ </small>
+
+ </div>
+
+ </div>
+
+ </div>
+
+ </div>
+
+ `;
+
+
+ /* ADMIN CONTROLS */
+
+ const controls =
+ document.getElementById("adminControls");
+
+
+ if(
+   currentUser &&
+   currentUser.role === "Admin"
+ ){
+
+   controls.classList.remove("hidden");
+
+   document.getElementById("newStatus")
+   .value =
+   complaint.status;
+
+ }
+ else{
+
+   controls.classList.add("hidden");
+
+ }
+
+}
+
+
+/* ===============================
+   CLOSE MODAL
+================================ */
+
+function closeModal(){
+
+ document
+ .getElementById("modal")
+ .classList.add("hidden");
+
+ selectedComplaintId =
+ null;
+
+}
+
+
+/* ===============================
+   UPDATE STATUS
+================================ */
+
+function updateStatus(){
+
+ if(!selectedComplaintId)
+ return;
+
+
+ if(
+   !currentUser ||
+   currentUser.role !== "Admin"
+ ){
+
+   alert("Only admin can update status.");
+
+   return;
+
+ }
+
+
+ const newStatus =
+ document.getElementById("newStatus")
+ .value;
+
+
+ const complaints =
+ loadData();
+
+
+ const complaint =
+ complaints.find(
+   c=>c.id===selectedComplaintId
+ );
+
+
+ if(!complaint)return;
+
+
+ complaint.status =
+ newStatus;
+
+
+ saveData(complaints);
+
+
+ alert(
+   "Status updated successfully!"
+ );
+
+
+ openComplaint(
+   selectedComplaintId
+ );
+
+
+ updateAll();
+
+}
+
+
+/* ===============================
+   ADMIN STATISTICS
+================================ */
+
+function renderAdminStats(){
+
+ const complaints =
+ loadData();
+
+ const total =
+ complaints.length;
+
+ const high =
+ complaints.filter(
+   c=>c.priority==="High"
+ ).length;
+
+ const pending =
+ complaints.filter(
+   c=>c.status==="Pending"
+ ).length;
+
+ const resolved =
+ complaints.filter(
+   c=>c.status==="Resolved"
+ ).length;
+
+
+ const adminPage =
+ document.getElementById("adminPage");
+
+
+ if(!adminPage)return;
+
+
+ const existing =
+ adminPage.querySelector(".admin-stats");
+
+
+ if(existing){
+
+   existing.innerHTML = `
+
+   <div class="stat">
+   <p>Total</p>
+   <h2>${total}</h2>
+   </div>
+
+   <div class="stat">
+   <p>High Priority</p>
+   <h2>${high}</h2>
+   </div>
+
+   <div class="stat">
+   <p>Pending</p>
+   <h2>${pending}</h2>
+   </div>
+
+   <div class="stat">
+   <p>Resolved</p>
+   <h2>${resolved}</h2>
+   </div>
+
+   `;
+
+ }
+
+}
+
+
+/* ===============================
+   CLICK OUTSIDE MODAL
+================================ */
+
+document
+.getElementById("modal")
+.addEventListener("click",function(e){
+
+ if(e.target === this){
+
+   closeModal();
+
+ }
+
+});
+
+
+/* ===============================
+   KEYBOARD ESCAPE
+================================ */
+
+document.addEventListener(
+"keydown",
+function(e){
+
+ if(e.key === "Escape"){
+
+   closeModal();
+
+ }
+
+});
+
+
+/* ===============================
+   FORM VALIDATION
+================================ */
+
+document
+.getElementById("complaintForm")
+.addEventListener("invalid",function(e){
+
+ e.target.style.borderColor =
+ "#ef4444";
+
+},true);
+
+
+/* ===============================
+   RESET INPUT BORDER
+================================ */
+
+document
+.querySelectorAll("input,select,textarea")
+.forEach(input=>{
+
+ input.addEventListener(
+ "input",
+ function(){
+
+   this.style.borderColor =
+   "#293553";
+
+ }
+ );
+
+});
+/* ===============================
+   ANALYTICS
+================================ */
+
+function renderAnalytics(){
+
+ const box =
+ document.getElementById("analytics");
+
+ if(!box)return;
+
+ const complaints =
+ loadData();
+
+ const total =
+ complaints.length;
+
+ if(!total){
+
+   box.innerHTML =
+   "<p style='color:#64748b'>No data available.</p>";
+
+   return;
+
+ }
+
+ const high =
+ complaints.filter(
+   c=>c.priority==="High"
+ ).length;
+
+ const medium =
+ complaints.filter(
+   c=>c.priority==="Medium"
+ ).length;
+
+ const low =
+ complaints.filter(
+   c=>c.priority==="Low"
+ ).length;
+
+ const resolved =
+ complaints.filter(
+   c=>c.status==="Resolved"
+ ).length;
+
+
+ function percent(value){
+
+   return Math.round(
+     (value / total) * 100
+   );
+
+ }
+
+
+ box.innerHTML = `
+
+ <div style="margin-bottom:20px">
+
+ <div style="
+ display:flex;
+ justify-content:space-between;
+ margin-bottom:7px
+ ">
+
+ <span>High Priority</span>
+
+ <b>${high}</b>
+
+ </div>
+
+ <div style="
+ height:9px;
+ background:#1e293b;
+ border-radius:20px;
+ overflow:hidden
+ ">
+
+ <div style="
+ width:${percent(high)}%;
+ height:100%;
+ background:#ef4444;
+ border-radius:20px
+ "></div>
+
+ </div>
+
+ </div>
+
+
+ <div style="margin-bottom:20px">
+
+ <div style="
+ display:flex;
+ justify-content:space-between;
+ margin-bottom:7px
+ ">
+
+ <span>Medium Priority</span>
+
+ <b>${medium}</b>
+
+ </div>
+
+ <div style="
+ height:9px;
+ background:#1e293b;
+ border-radius:20px;
+ overflow:hidden
+ ">
+
+ <div style="
+ width:${percent(medium)}%;
+ height:100%;
+ background:#f59e0b;
+ border-radius:20px
+ "></div>
+
+ </div>
+
+ </div>
+
+
+ <div style="margin-bottom:20px">
+
+ <div style="
+ display:flex;
+ justify-content:space-between;
+ margin-bottom:7px
+ ">
+
+ <span>Low Priority</span>
+
+ <b>${low}</b>
+
+ </div>
+
+ <div style="
+ height:9px;
+ background:#1e293b;
+ border-radius:20px;
+ overflow:hidden
+ ">
+
+ <div style="
+ width:${percent(low)}%;
+ height:100%;
+ background:#10b981;
+ border-radius:20px
+ "></div>
+
+ </div>
+
+ </div>
+
+
+ <div style="
+ margin-top:25px;
+ padding:18px;
+ background:#0b1328;
+ border-radius:13px
+ ">
+
+ <div style="color:#64748b;font-size:11px">
+ RESOLUTION RATE
+ </div>
+
+ <div style="
+ font-size:30px;
+ font-weight:bold;
+ margin-top:7px
+ ">
+
+ ${percent(resolved)}%
+
+ </div>
+
+ <div style="
+ color:#64748b;
+ font-size:11px;
+ margin-top:5px
+ ">
+
+ ${resolved} of ${total} complaints resolved
+
+ </div>
+
+ </div>
+
+ `;
+
+
+ /* SMART INSIGHT */
+
+ const insight =
+ document.getElementById("insight");
+
+ if(insight){
+
+   let message = "";
+
+   if(high > 0){
+
+     message =
+     `There are ${high} high-priority complaint(s).
+     These should be reviewed first by the authority team.`;
+
+   }
+   else{
+
+     message =
+     "There are currently no high-priority complaints.";
+
+   }
+
+
+   if(resolved > 0){
+
+     message +=
+     ` The system has successfully resolved
+     ${resolved} complaint(s).`;
+
+   }
+
+
+   insight.textContent =
+   message;
+
+ }
+
+}
+
+
+/* ===============================
+   NOTIFICATIONS
+================================ */
+
+function renderNotifications(){
+
+ const box =
+ document.getElementById("notifications");
+
+ if(!box)return;
+
+ const complaints =
+ loadData();
+
+
+ const myComplaints =
+ complaints.filter(
+   c=>c.user === currentUser?.username
+ );
+
+
+ if(!myComplaints.length){
+
+   box.innerHTML = `
+
+   <div class="card">
+
+   <h3>🔔 No New Notifications</h3>
+
+   <p style="
+   color:#64748b;
+   margin-top:8px
+   ">
+
+   Notifications related to your complaints
+   will appear here.
+
+   </p>
+
+   </div>
+
+   `;
+
+   return;
+
+ }
+
+
+ box.innerHTML =
+ myComplaints.slice(0,8)
+ .map(c=>{
+
+   let icon = "📋";
+
+   let message =
+   "Complaint has been submitted.";
+
+   if(c.status === "In Progress"){
+
+     icon = "🔄";
+
+     message =
+     "Your complaint is currently being reviewed.";
+
+   }
+
+   if(c.status === "Resolved"){
+
+     icon = "✅";
+
+     message =
+     "Your complaint has been resolved.";
+
+   }
+
+   if(c.status === "Rejected"){
+
+     icon = "❌";
+
+     message =
+     "Your complaint has been rejected.";
+
+   }
+
+   if(c.priority === "High"){
+
+     icon = "🚨";
+
+     message =
+     "High-priority complaint requires immediate attention.";
+
+   }
+
+
+   return `
+
+   <div class="card" style="margin-bottom:12px">
+
+   <div style="
+   display:flex;
+   gap:15px;
+   align-items:flex-start
+   ">
+
+   <div style="
+   width:42px;
+   height:42px;
+   border-radius:12px;
+   background:#6c63ff18;
+   display:grid;
+   place-items:center;
+   font-size:19px
+   ">
+
+   ${icon}
+
+   </div>
+
+   <div style="flex:1">
+
+   <b>${escapeHTML(c.title)}</b>
+
+   <p style="
+   color:#64748b;
+   font-size:12px;
+   margin-top:5px;
+   line-height:1.6
+   ">
+
+   ${message}
+
+   </p>
+
+   <small style="color:#475569">
+
+   ${c.id} • ${c.date}
+
+   </small>
+
+   </div>
+
+   <button
+   class="action"
+   onclick="openComplaint('${c.id}')"
+   >
+
+   View
+
+   </button>
+
+   </div>
+
+   </div>
+
+   `;
+
+ }).join("");
+
+}
+
+
+/* ===============================
+   ADMIN REPORT
+================================ */
+
+function report(){
+
+ if(
+   !currentUser ||
+   currentUser.role !== "Admin"
+ ){
+
+   alert(
+   "Admin access required."
+   );
+
+   return;
+
+ }
+
+
+ const complaints =
+ loadData();
+
+
+ const total =
+ complaints.length;
+
+ const high =
+ complaints.filter(
+   c=>c.priority==="High"
+ ).length;
+
+ const medium =
+ complaints.filter(
+   c=>c.priority==="Medium"
+ ).length;
+
+ const low =
+ complaints.filter(
+   c=>c.priority==="Low"
+ ).length;
+
+ const pending =
+ complaints.filter(
+   c=>c.status==="Pending"
+ ).length;
+
+ const progress =
+ complaints.filter(
+   c=>c.status==="In Progress"
+ ).length;
+
+ const resolved =
+ complaints.filter(
+   c=>c.status==="Resolved"
+ ).length;
+
+ const rejected =
+ complaints.filter(
+   c=>c.status==="Rejected"
+ ).length;
+
+
+ const reportText = `
+
+RESOLVEIQ
+SMART COMPLAINT PRIORITIZATION
+SYSTEM REPORT
+
+====================================
+
+Generated On:
+${new Date().toLocaleString()}
+
+TOTAL COMPLAINTS
+${total}
+
+PRIORITY DISTRIBUTION
+High: ${high}
+Medium: ${medium}
+Low: ${low}
+
+STATUS DISTRIBUTION
+Pending: ${pending}
+In Progress: ${progress}
+Resolved: ${resolved}
+Rejected: ${rejected}
+
+====================================
+
+COMPLAINT DETAILS
+
+${complaints.map(c=>`
+
+ID: ${c.id}
+Title: ${c.title}
+Category: ${c.category}
+Priority: ${c.priority}
+Score: ${c.score}/100
+Status: ${c.status}
+Location: ${c.location}
+Date: ${c.date}
+
+----------------------------
+
+`).join("")}
+
+Generated by ResolveIQ
+`;
+
+
+ const blob =
+ new Blob(
+   [reportText],
+   {type:"text/plain"}
+ );
+
+
+ const url =
+ URL.createObjectURL(blob);
+
+
+ const link =
+ document.createElement("a");
+
+
+ link.href = url;
+
+ link.download =
+ "ResolveIQ_Complaint_Report.txt";
+
+
+ link.click();
+
+
+ URL.revokeObjectURL(url);
+
+
+ alert(
+ "Report generated successfully!"
+ );
+
+}
+
+
+/* ===============================
+   RESET DEMO DATA
+================================ */
+
+function resetData(){
+
+ if(
+   !currentUser ||
+   currentUser.role !== "Admin"
+ ){
+
+   alert(
+   "Only admin can reset data."
+   );
+
+   return;
+
+ }
+
+
+ const confirmReset =
+ confirm(
+ "Are you sure you want to reset all complaint data?"
+ );
+
+
+ if(!confirmReset)return;
+
+
+ localStorage.setItem(
+   STORAGE_KEY,
+   JSON.stringify(demoComplaints)
+ );
+
+
+ updateAll();
+
+
+ alert(
+ "Complaint data has been reset."
+ );
+
+}
+
+
+/* ===============================
+   ADMIN QUICK ACTION
+================================ */
+
+function addResetButton(){
+
+ const adminPage =
+ document.getElementById("adminPage");
+
+ if(!adminPage)return;
+
+
+ if(
+   adminPage.querySelector(
+   ".reset-data-btn"
+   )
+ )return;
+
+
+ const button =
+ document.createElement("button");
+
+
+ button.className =
+ "btn secondary reset-data-btn";
+
+
+ button.style.marginTop =
+ "15px";
+
+
+ button.textContent =
+ "♻ Reset Demo Data";
+
+
+ button.onclick =
+ resetData;
+
+
+ adminPage
+ .querySelector(".card")
+ .appendChild(button);
+
+}
+
+
+/* ===============================
+   SYSTEM STATUS
+================================ */
+
+function systemStatus(){
+
+ const online =
+ document.querySelector(
+   "#dashboardPage .hero span"
+ );
+
+
+ if(online){
+
+   online.textContent =
+   "● SYSTEM ONLINE";
+
+ }
+
+}
+
+
+/* ===============================
+   INITIALIZE APPLICATION
+================================ */
+
+function initializeApp(){
+
+ loadData();
+
+ systemStatus();
+
+ addResetButton();
+
+ updateAll();
+
+}
+
+
+/* ===============================
+   PERIODIC REFRESH
+================================ */
+
+setInterval(function(){
+
+ if(currentUser){
+
+   updateDashboard();
+
+   renderTable();
+
+ }
+
+},5000);
+
+
+/* ===============================
+   START SYSTEM
+================================ */
+
+initializeApp();
+
+
+/* ===============================
+   FINAL CONSOLE MESSAGE
+================================ */
+
+console.log(
+`
+=========================================
+       RESOLVEIQ SYSTEM
+ SMART COMPLAINT PRIORITIZATION
+=========================================
+
+System Status : ONLINE
+Storage       : LocalStorage
+Priority AI   : Rule-Based Engine
+Authentication: Demo Login
+
+User Login:
+student / 1234
+
+Admin Login:
+admin / admin123
+
+=========================================
+`
+);

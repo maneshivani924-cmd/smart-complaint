@@ -1,0 +1,314 @@
+```html
+<div class="page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="brand">
+      <div class="brand-icon">🏫</div>
+      <div>
+        <h2>Smart Classroom</h2>
+        <span>Complaint Prioritization</span>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#complaint">Submit Complaint</a>
+      <a href="#dashboard">Dashboard</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="small-badge">SMART CLASSROOM MANAGEMENT</span>
+
+        <h1>
+          Report Classroom Problems
+          <span>Quickly & Easily</span>
+        </h1>
+
+        <p>
+          Submit classroom complaints and let our smart system
+          automatically prioritize them based on urgency and impact.
+        </p>
+
+        <a href="#complaint" class="hero-button">
+          📝 Submit a Complaint
+        </a>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-card-icon">🎓</div>
+        <h3>Better Classroom</h3>
+        <p>Better learning environment</p>
+
+        <div class="mini-stat">
+          <strong>24/7</strong>
+          <span>Complaint Access</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section-heading">
+      <span>HOW IT WORKS</span>
+      <h2>Simple. Smart. Effective.</h2>
+      <p>Report classroom issues in just three easy steps.</p>
+    </div>
+
+    <div class="steps">
+
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon">📝</div>
+        <h3>Submit Complaint</h3>
+        <p>Enter the classroom problem and provide the required details.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon">⚡</div>
+        <h3>Smart Priority</h3>
+        <p>The system calculates the priority using urgency and impact.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon">✅</div>
+        <h3>Resolve Issue</h3>
+        <p>Staff can track the complaint and update its status.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COMPLAINT FORM -->
+  <section class="complaint-section" id="complaint">
+    <div class="form-container">
+
+      <div class="form-intro">
+        <span class="small-badge">REPORT AN ISSUE</span>
+        <h2>Submit Classroom Complaint</h2>
+        <p>
+          Tell us about the problem in your classroom.
+          Your complaint will be automatically prioritized.
+        </p>
+
+        <div class="issue-list">
+          <div>🪑 Broken bench or desk</div>
+          <div>💡 Light not working</div>
+          <div>🌀 Fan / AC problem</div>
+          <div>📽️ Projector problem</div>
+          <div>🧹 Cleaning issue</div>
+          <div>🚪 Door or window problem</div>
+        </div>
+      </div>
+
+      <div class="complaint-form">
+
+        <label>Complaint Title</label>
+        <input
+          type="text"
+          [(ngModel)]="title"
+          placeholder="Example: Classroom fan is not working"
+        />
+
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="description"
+          rows="5"
+          placeholder="Describe the classroom problem..."
+        ></textarea>
+
+        <div class="form-row">
+
+          <div class="form-group">
+            <label>Category</label>
+            <select [(ngModel)]="category">
+              <option value="General">General</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Cleaning">Cleaning</option>
+              <option value="Projector">Projector</option>
+              <option value="Fan / AC">Fan / AC</option>
+              <option value="Door / Window">Door / Window</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Urgency</label>
+            <select [(ngModel)]="urgency">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+        </div>
+
+        <label>Impact on Classroom</label>
+        <select [(ngModel)]="impact">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+
+        <button class="submit-button" (click)="submitComplaint()">
+          Submit Complaint
+          <span>→</span>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="dashboard-section" id="dashboard">
+
+    <div class="section-heading">
+      <span>ADMIN DASHBOARD</span>
+      <h2>Classroom Complaint Dashboard</h2>
+      <p>Track and manage all submitted classroom complaints.</p>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="stats">
+
+      <div class="stat-card">
+        <div class="stat-icon total">📋</div>
+        <div>
+          <span>Total Complaints</span>
+          <strong>{{ complaints.length }}</strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon pending">⏳</div>
+        <div>
+          <span>Pending</span>
+          <strong>
+            {{ complaints.filter(c => c.status === 'Pending').length }}
+          </strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon progress">🔧</div>
+        <div>
+          <span>In Progress</span>
+          <strong>
+            {{ complaints.filter(c => c.status === 'In Progress').length }}
+          </strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon resolved">✅</div>
+        <div>
+          <span>Resolved</span>
+          <strong>
+            {{ complaints.filter(c => c.status === 'Resolved').length }}
+          </strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COMPLAINT CARDS -->
+    <div class="complaint-list">
+
+      <div
+        class="complaint-card"
+        *ngFor="let complaint of complaints"
+      >
+
+        <div class="complaint-top">
+
+          <div>
+            <span class="category-badge">
+              {{ complaint.category }}
+            </span>
+
+            <h3>{{ complaint.title }}</h3>
+          </div>
+
+          <span
+            class="priority"
+            [ngClass]="getPriorityClass(complaint.priority)"
+          >
+            {{ complaint.priority }}
+          </span>
+
+        </div>
+
+        <p class="description">
+          {{ complaint.description }}
+        </p>
+
+        <div class="complaint-info">
+
+          <div>
+            <span>Urgency</span>
+            <strong>{{ complaint.urgency }}</strong>
+          </div>
+
+          <div>
+            <span>Impact</span>
+            <strong>{{ complaint.impact }}</strong>
+          </div>
+
+          <div>
+            <span>Status</span>
+            <strong>{{ complaint.status }}</strong>
+          </div>
+
+        </div>
+
+        <div class="complaint-actions">
+
+          <select
+            [value]="complaint.status"
+            (change)="updateStatus(complaint._id, $any($event.target).value)"
+          >
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+
+          <button
+            class="delete-button"
+            (click)="deleteComplaint(complaint._id)"
+          >
+            🗑 Delete
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="empty-state" *ngIf="complaints.length === 0">
+        <div>📭</div>
+        <h3>No Complaints Yet</h3>
+        <p>Submitted classroom complaints will appear here.</p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <strong>🏫 Smart Classroom Complaint Prioritization</strong>
+      <p>Making classrooms better through smart complaint management.</p>
+    </div>
+
+    <span>© 2026 Smart Classroom System</span>
+  </footer>
+
+</div>
